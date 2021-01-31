@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>R2DBC Example - Protected</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            var doHeartbeat = function () {
+                console.log('Heartbeat...');
+
+                data = {};
+                data.text = $("#textInput").val();
+
+                $.ajax({
+                    type: "POST",
+                    url: '/heartbeat',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json'
+                });
+            };
+
+            var refreshTable = function () {
+                $.get("/heartbeat", function( data ) {
+                    var tableString = '';
+
+                    $.each(data, function(idx, val) {
+                        tableString += ('<tr><td>'+val.id+'</td><td>'+val.timestamp+'</td><td>'+val.username+'</td></tr>');
+                    });
+
+                    $( "#heartbeatTable > tbody" ).html(tableString);
+                });
+            }
+
+            setInterval(doHeartbeat, 1000);
+            // setInterval(refreshTable, 2000);
+        });
+    </script>
+</head>
+<body>
+<h3>Inputs</h3>
+<input id="textInput" type="text" value="Change this"/>
+
+<h3>Heartbeats</h3>
+<table id="heartbeatTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Timestamp</th>
+        <th>Username</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</body>
+</html>
