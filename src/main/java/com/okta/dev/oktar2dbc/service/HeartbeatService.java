@@ -2,29 +2,13 @@ package com.okta.dev.oktar2dbc.service;
 
 import com.okta.dev.oktar2dbc.database.HeartbeatEntity;
 import com.okta.dev.oktar2dbc.database.HeartbeatRepository;
-import io.r2dbc.spi.Row;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.CoreSubscriber;
-import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ParallelFlux;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.SubmissionPublisher;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 @Service
 public class HeartbeatService {
@@ -54,6 +38,6 @@ public class HeartbeatService {
 
         return ServerResponse.ok()
                 .contentType(MediaType.TEXT_EVENT_STREAM)
-                .body(heartbeatRepository.findAll().limitRate(1), HeartbeatEntity.class);
+                .body(heartbeatRepository.findAll(), HeartbeatEntity.class);
     }
 }

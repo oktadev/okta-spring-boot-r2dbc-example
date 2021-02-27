@@ -8,9 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer;
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
 @EnableScheduling
@@ -18,7 +16,6 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableR2dbcRepositories
 @SpringBootApplication
 public class OktaR2dbcApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(OktaR2dbcApplication.class, args);
 	}

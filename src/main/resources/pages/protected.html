@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>R2DBC Example - Protected</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            // $.get("/userList", function( data ) {
+            //     var tableString = '';
+            //
+            //     $.each(data, function(idx, val) {
+            //         tableString += ('<tr><td>'+val.id+'</td><td>'+val.name+'</td><td>'+val.email+'</td></tr>');
+            //     });
+            //
+            //     $( "#userTable > tbody" ).html(tableString);
+            // });
+
+            var cnx = new EventSource('http://localhost:8080/userList');
+            cnx.onmessage = function (e) {
+                var data = JSON.parse(e.data);
+                console.log(data);
+            };
+        });
+    </script>
+</head>
+<body>
+<h1>Okta login successful!</h1>
+<h3>Users</h3>
+<table id="userTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</body>
+</html>
