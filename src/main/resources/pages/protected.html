@@ -6,33 +6,24 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript">
         $(function() {
-            // $.get("/userList", function( data ) {
-            //     var tableString = '';
-            //
-            //     $.each(data, function(idx, val) {
-            //         tableString += ('<tr><td>'+val.id+'</td><td>'+val.name+'</td><td>'+val.email+'</td></tr>');
-            //     });
-            //
-            //     $( "#userTable > tbody" ).html(tableString);
-            // });
-
-            var cnx = new EventSource('http://localhost:8080/userList');
+            var cnx = new EventSource('http://localhost:8080/heartbeats');
             cnx.onmessage = function (e) {
                 var data = JSON.parse(e.data);
-                console.log(data);
+                var htmlText = '<tr><td>'+data.id+'</td><td>'+data.timestamp+'</td><td>'+data.text+'</td></tr>';
+                $( "#heartbeatTable > tbody" ).append(htmlText);
             };
         });
     </script>
 </head>
 <body>
 <h1>Okta login successful!</h1>
-<h3>Users</h3>
-<table id="userTable">
+<h3>Heartbeats</h3>
+<table id="heartbeatTable">
     <thead>
     <tr>
         <th>ID</th>
-        <th>Name</th>
-        <th>Email</th>
+        <th>Timestamp</th>
+        <th>Text</th>
     </tr>
     </thead>
     <tbody>

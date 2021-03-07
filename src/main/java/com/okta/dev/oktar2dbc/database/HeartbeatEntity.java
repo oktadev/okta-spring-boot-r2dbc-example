@@ -4,9 +4,6 @@ import org.springframework.data.annotation.Id;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.util.Date;
 
 public class HeartbeatEntity {
     @Id

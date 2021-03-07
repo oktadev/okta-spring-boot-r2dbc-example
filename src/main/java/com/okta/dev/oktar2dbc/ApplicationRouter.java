@@ -1,12 +1,11 @@
 package com.okta.dev.oktar2dbc;
 
-import com.okta.dev.oktar2dbc.database.UserEntity;
-import com.okta.dev.oktar2dbc.database.UserRepository;
+import com.okta.dev.oktar2dbc.database.HeartbeatEntity;
+import com.okta.dev.oktar2dbc.database.HeartbeatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -19,8 +18,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.stream.Stream;
+import java.time.Duration;
 
 @Configuration
 public class ApplicationRouter {
@@ -31,32 +29,28 @@ public class ApplicationRouter {
     @Value("classpath:pages/protected.html")
     private Resource protectedHtml;
 
-    private final UserRepository userRepository;
+    private final HeartbeatRepository heartbeatRepository;
 
     @Autowired
-    public ApplicationRouter(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public ApplicationRouter(HeartbeatRepository heartbeatRepository) {
+        this.heartbeatRepository = heartbeatRepository;
     }
 
     @Bean
-    @DependsOn("connectionFactoryInitializer")
     public RouterFunction<ServerResponse> route() {
-        this.userRepository.findAll().subscribe(userEntity -> System.err.println("DING"));
-
-        UserEntity e1 = new UserEntity();
-        e1.setEmail("hurrr");
-
         return RouterFunctions
                 .route(RequestPredicates.GET("/index"), request -> pageResponse(indexHtml))
                 .andRoute(RequestPredicates.GET("/"), request -> pageResponse(indexHtml))
                 .andRoute(RequestPredicates.GET("/protected"), request -> pageResponse(protectedHtml))
-                .andRoute(RequestPredicates.GET("/userList"), request -> {
-                    List<UserEntity> users = userRepository.findAll().collectList().block();
+                .andRoute(RequestPredicates.GET("/heartbeats"), request -> {
+                    Flux<Long> interval = Flux.interval(Duration.ofSeconds(1));
+                    Flux<HeartbeatEntity> heartbeatEntityFlux = heartbeatRepository.findAll();
+                    Flux<HeartbeatEntity> zipped = Flux.zip(heartbeatEntityFlux, interval, (key, value) -> key);
 
                     return ServerResponse
                             .ok()
                             .contentType(MediaType.TEXT_EVENT_STREAM)
-                            .body(Flux.fromStream(Stream.of(e1)), UserEntity.class);
+                            .body(zipped, HeartbeatEntity.class);
                 });
     }
 

@@ -3,41 +3,43 @@ package com.okta.dev.oktar2dbc.service;
 import com.okta.dev.oktar2dbc.database.HeartbeatEntity;
 import com.okta.dev.oktar2dbc.database.HeartbeatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
+
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class HeartbeatService {
-
     private final HeartbeatRepository heartbeatRepository;
-    private final DatabaseClient databaseClient;
-//    private final Flux<HeartbeatEntity> heartbeatEntityFlux;
 
     @Autowired
-    public HeartbeatService(HeartbeatRepository heartbeatRepository, DatabaseClient databaseClient) {
+    public HeartbeatService(HeartbeatRepository heartbeatRepository) {
         this.heartbeatRepository = heartbeatRepository;
-//        this.heartbeatEntityFlux = heartbeatRepository.findAll();
-        this.databaseClient = databaseClient;
     }
 
-    public Mono<ServerResponse> getAllHeartbeats(ServerRequest serverRequest) {
-//        Flux<HeartbeatEntity> flux = databaseClient
-//                .sql("SELECT * FROM HEARTBEAT_ENTITY")
-//                .map(new Function<Row, HeartbeatEntity>() {
-//                    @Override
-//                    public HeartbeatEntity apply(Row row) {
-//                        System.err.println(row);
-//                        return new HeartbeatEntity();
-//                    }
-//                })
-//                .all();
+    @Scheduled(fixedRate = 1000)
+    public void create() {
+        HeartbeatEntity heartbeatEntity = new HeartbeatEntity();
+        heartbeatEntity.setTimestamp(System.currentTimeMillis());
+        heartbeatEntity.setText(randomString());
+        heartbeatEntity.setUsername("system");
+        heartbeatRepository.save(heartbeatEntity)
+                .log()
+                .then()
+                .subscribe();
+    }
 
-        return ServerResponse.ok()
-                .contentType(MediaType.TEXT_EVENT_STREAM)
-                .body(heartbeatRepository.findAll(), HeartbeatEntity.class);
+    private static String randomString() {
+        int lower = 'A';
+        int upper = 'Z';
+
+        return IntStream.range(0, 10)
+                .mapToObj(i -> {
+                    double range = upper-lower;
+                    char charIdx = ((char)(lower + (range * Math.random())));
+                    return new String(new char[]{charIdx});
+                })
+                .collect(Collectors.joining());
     }
 }
