@@ -16,6 +16,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableR2dbcRepositories
 @SpringBootApplication
 public class OktaR2dbcApplication {
+
 	public static void main(String[] args) {
 		SpringApplication.run(OktaR2dbcApplication.class, args);
 	}
@@ -27,4 +28,5 @@ public class OktaR2dbcApplication {
 		initializer.setDatabasePopulator(new ResourceDatabasePopulator(new ClassPathResource("schema.sql")));
 		return initializer;
 	}
+
 }

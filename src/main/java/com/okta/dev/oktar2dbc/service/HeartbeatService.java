@@ -18,7 +18,7 @@ public class HeartbeatService {
         this.heartbeatRepository = heartbeatRepository;
     }
 
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 1000) // 1 second
     public void create() {
         HeartbeatEntity heartbeatEntity = new HeartbeatEntity();
         heartbeatEntity.setTimestamp(System.currentTimeMillis());

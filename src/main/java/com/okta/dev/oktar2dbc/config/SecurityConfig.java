@@ -13,7 +13,6 @@ import org.springframework.security.web.server.authentication.RedirectServerAuth
 @EnableWebFluxSecurity
 @Configuration
 public class SecurityConfig {
-
     @Bean
     public ReactiveUserDetailsService userDetailsService(UserRepository userRepository) {
         return new DbUserService(userRepository);
@@ -22,13 +21,13 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain configure(ServerHttpSecurity http) throws Exception {
         return http
-                .csrf().disable()
-                .authorizeExchange()
-                .pathMatchers("/", "/index").permitAll()
-                .anyExchange().authenticated()
-                .and()
-                .oauth2Login()
-                .authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler("/protected"))
-                .and().build();
+            .csrf().disable()
+            .authorizeExchange()
+            .pathMatchers("/", "/index").permitAll()
+            .anyExchange().authenticated()
+            .and()
+            .oauth2Login()
+            .authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler("/protected"))
+            .and().build();
     }
 }
