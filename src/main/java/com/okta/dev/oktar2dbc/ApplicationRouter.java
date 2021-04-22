@@ -2,7 +2,6 @@ package com.okta.dev.oktar2dbc;
 
 import com.okta.dev.oktar2dbc.database.HeartbeatEntity;
 import com.okta.dev.oktar2dbc.database.HeartbeatRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,15 +22,16 @@ import java.time.Duration;
 @Configuration
 public class ApplicationRouter {
 
+    // (1)
     @Value("classpath:pages/index.html")
     private Resource indexHtml;
 
+    // (2)
     @Value("classpath:pages/protected.html")
     private Resource protectedHtml;
 
     private final HeartbeatRepository heartbeatRepository;
 
-    @Autowired
     public ApplicationRouter(HeartbeatRepository heartbeatRepository) {
         this.heartbeatRepository = heartbeatRepository;
     }
@@ -39,25 +39,25 @@ public class ApplicationRouter {
     @Bean
     public RouterFunction<ServerResponse> route() {
         return RouterFunctions
-                .route(RequestPredicates.GET("/index"), request -> pageResponse(indexHtml))
-                .andRoute(RequestPredicates.GET("/"), request -> pageResponse(indexHtml))
-                .andRoute(RequestPredicates.GET("/protected"), request -> pageResponse(protectedHtml))
-                .andRoute(RequestPredicates.GET("/heartbeats"), request -> {
-                    Flux<Long> interval = Flux.interval(Duration.ofSeconds(1));
-                    Flux<HeartbeatEntity> heartbeatEntityFlux = heartbeatRepository.findAll();
-                    Flux<HeartbeatEntity> zipped = Flux.zip(heartbeatEntityFlux, interval, (key, value) -> key);
+            .route(RequestPredicates.GET("/index"), request -> pageResponse(indexHtml))
+            .andRoute(RequestPredicates.GET("/"), request -> pageResponse(indexHtml))
+            .andRoute(RequestPredicates.GET("/protected"), request -> pageResponse(protectedHtml))
+            .andRoute(RequestPredicates.GET("/heartbeats"), request -> {
+                Flux<Long> interval = Flux.interval(Duration.ofSeconds(1));
+                Flux<HeartbeatEntity> heartbeatEntityFlux = heartbeatRepository.findAll();
+                Flux<HeartbeatEntity> zipped = Flux.zip(heartbeatEntityFlux, interval, (key, value) -> key);
 
-                    return ServerResponse
-                            .ok()
-                            .contentType(MediaType.TEXT_EVENT_STREAM)
-                            .body(zipped, HeartbeatEntity.class);
-                });
+                return ServerResponse
+                    .ok()
+                    .contentType(MediaType.TEXT_EVENT_STREAM)
+                    .body(zipped, HeartbeatEntity.class);
+            });
     }
 
     private static Mono<ServerResponse> pageResponse(Resource page) {
         return ServerResponse
                 .ok()
-                .contentType(MediaType.TEXT_HTML)
+                .contentType(MediaType.TEXT_HTML) // (5)
                 .body(DataBufferUtils.read(page, new DefaultDataBufferFactory(), 4096), DataBuffer.class);
     }
 }

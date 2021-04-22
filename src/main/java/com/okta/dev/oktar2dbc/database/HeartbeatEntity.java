@@ -14,14 +14,6 @@ public class HeartbeatEntity {
     private String username;
     private String text;
 
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
     public Long getId() {
         return id;
     }
@@ -44,5 +36,13 @@ public class HeartbeatEntity {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }
