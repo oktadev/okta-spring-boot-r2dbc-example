@@ -4,7 +4,7 @@
 
 = R2DBC and Spring Demo Steps
 
-In this demo, I'll show how to create use Spring WebFlux and R2DBC to provide reactive, non-blocking access to a relational database. You'll see how to build a secure, OAuth 2.0-protected, app and stream its data.
+In this demo, I'll show how to use Spring WebFlux and R2DBC to provide reactive, non-blocking access to a relational database. You'll see how to build a secure, OAuth 2.0-protected, app and stream its data.
 
 **Prerequisites:**
 
