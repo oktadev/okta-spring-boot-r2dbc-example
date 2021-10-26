@@ -23,7 +23,7 @@ toc::[]
 
 == Create a Spring Boot Project with R2DBC
 
-Using https://start.spring.io/#!type=maven-project&language=java&platformVersion=2.4.5.RELEASE&packaging=jar&jvmVersion=11&groupId=com.okta.dev&artifactId=okta-r2dbc&name=okta-r2dbc&description=Spring%20Boot%20App%20for%20Okta%20%2B%20R2DBC&packageName=com.okta.dev.oktar2dbc&dependencies=lombok,data-jpa,data-r2dbc,webflux,okta,h2[start.spring.io], create an app with the following settings:
+Using https://start.spring.io/#!type=maven-project&language=java&platformVersion=2.5.6&packaging=jar&jvmVersion=11&groupId=com.okta.dev&artifactId=okta-r2dbc&name=okta-r2dbc&description=Spring%20Boot%20App%20for%20Okta%20%2B%20R2DBC&packageName=com.okta.dev.oktar2dbc&dependencies=lombok,data-jpa,data-r2dbc,webflux,okta,h2[start.spring.io], create an app with the following settings:
 
 - Group: `com.okta.dev`
 - Artifact: `okta-r2dbc`
@@ -49,7 +49,6 @@ okta.oauth2.issuer=https://MY_OKTA_DOMAIN.okta.com/oauth2/default
 okta.oauth2.clientId=CLIENT_ID
 okta.oauth2.clientSecret=CLIENT_SECRET
 
-spring.data.r2dbc.repositories.enabled=true
 spring.r2dbc.url=r2dbc:h2:mem://./testdb
 ----
 +
@@ -62,11 +61,7 @@ Make sure `MY_OKTA_DOMAIN`, `CLIENT_ID`, and `CLIENT_SECRET` are replaced with v
 @EnableWebFlux
 @EnableR2dbcRepositories
 @SpringBootApplication
-public class OktaR2dbcApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(OktaR2dbcApplication.class, args);
-    }
-}
+public class OktaR2dbcApplication { ... }
 ----
 
 . Create a `UserEntity` in a new `database` package:
