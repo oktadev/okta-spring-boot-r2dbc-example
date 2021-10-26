@@ -191,7 +191,7 @@ public ApplicationRouter(HeartbeatRepository heartbeatRepository) {
 
 . Restart the app, go to `http://localhost:8080/protected`, and you'll see a streaming, constantly updating list of heartbeats.
 
-== R2DBC for faster access!
+== Use R2DBC for non-blocking database access!
 
 💡 Find the code on GitHub: https://github.com/oktadev/okta-spring-boot-r2dbc-example[@oktadev/okta-spring-boot-r2dbc-example]
 
