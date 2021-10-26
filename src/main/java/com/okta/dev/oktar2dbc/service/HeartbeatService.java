@@ -38,7 +38,7 @@ public class HeartbeatService {
                 .mapToObj(i -> {
                     double range = upper-lower;
                     char charIdx = ((char)(lower + (range * Math.random())));
-                    return new String(new char[]{charIdx});
+                    return String.valueOf(charIdx);
                 })
                 .collect(Collectors.joining());
     }

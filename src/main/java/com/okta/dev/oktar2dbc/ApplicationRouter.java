@@ -22,11 +22,9 @@ import java.time.Duration;
 @Configuration
 public class ApplicationRouter {
 
-    // (1)
     @Value("classpath:pages/index.html")
     private Resource indexHtml;
 
-    // (2)
     @Value("classpath:pages/protected.html")
     private Resource protectedHtml;
 
@@ -57,7 +55,7 @@ public class ApplicationRouter {
     private static Mono<ServerResponse> pageResponse(Resource page) {
         return ServerResponse
                 .ok()
-                .contentType(MediaType.TEXT_HTML) // (5)
+                .contentType(MediaType.TEXT_HTML)
                 .body(DataBufferUtils.read(page, new DefaultDataBufferFactory(), 4096), DataBuffer.class);
     }
 }
