@@ -4,7 +4,7 @@
 
 = R2DBC and Spring Demo Steps
 
-In this demo, I'll show how to use Spring WebFlux and R2DBC to provide reactive, non-blocking access to a relational database. You'll see how to build a secure, OAuth 2.0-protected, app and stream its data.
+In this demo, I'll show how to use Spring WebFlux and R2DBC to provide reactive, non-blocking access to a relational database. You'll see how to build a secure, OAuth 2.0-protected app, and stream its data.
 
 **Prerequisites:**
 
@@ -84,8 +84,10 @@ public class UserEntity {
     private String name;
 }
 ----
++
+TIP: If you're using an IDE, you'll need to https://projectlombok.org/setup/overview[set up Lombok].
 
-. Define a reactive `R2dbcRepository` to manage this entity:
+. Define a reactive `R2dbcRepository` interface to manage this entity:
 +
 [source,java]
 ----
@@ -114,37 +116,78 @@ The `DbUserService` handles requests from OAuth 2.0 to automatically load users 
 
 == Create an HTML client to see your data
 
-. Create a file at `src/main/resources/pages/index.html`
+. Create a file at `src/main/resources/pages/index.html` [`r2dbc-index`]
 
-. Create a file at `src/main/resources/pages/protected.html`
+. Create a file at `src/main/resources/pages/protected.html` [`r2dbc-protected`]
 
-. Create an `ApplicationRouter.java` class. [`r2dbc-router`]
+. Create an `ApplicationRouter.java` class [`r2dbc-router`]
 
-. Create a file at `src/main/resources/schema.sql` to create a database schema. [`r2dbc-schema`]
-
-. Add a `ConnectionFactoryInitializer` bean in `OktaR2dbcApplication` to automatically detect and execute this script on startup. [`r2dbc-init`]
+. Create a file at `src/main/resources/schema.sql` to create a database schema [`r2dbc-schema`]
 
 . Open a terminal and run your app with `./mvnw spring-boot:run`
 
-. Open `http://localhost:8080` to see the unprotected index page. Go to `/protected`. You'll prompted to log in with Okta, and after successfully authenticating, returned to the protected page.
+. Open `http://localhost:8080` to see the unprotected index page. Go to `/protected`. You'll be prompted to log in with Okta, and after successfully authenticating, returned to the protected page.
 
 == Stream Data to a Webpage Using R2DBC
 
+You've successfully implemented R2DBC in your Spring Boot application, but the behavior is still non-reactive: querying and saving users during authentication is still a synchronous, blocking process. In the next steps, you'll see how to implement a non-blocking API endpoint which reads from the database using reactive techniques.
+
 . Create a `database.HeartbeatEntity` entity.
++
+[source,java]
+----
+package com.okta.dev.oktar2dbc.database;
 
-. Create a `database.HeartbeatRepository` repository class.
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 
-. Add the table definition for `HEARTBEAT_ENTITY` to `schema.sql`.
+@Data
+public class HeartbeatEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+    private Long timestamp;
+    private String username;
+    private String text;
+}
+----
 
-. Create a `service.HeartbeatService` class to generate and save heartbeats to the database.
+. Create a `database.HeartbeatRepository` repository interface.
++
+[source,java]
+----
+package com.okta.dev.oktar2dbc.database;
+
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface HeartbeatRepository extends R2dbcRepository<HeartbeatEntity, Long> {
+}
+----
+
+. Add the table definition for `HEARTBEAT_ENTITY` to `schema.sql`. [`r2dbc-schema-heartbeat`]
+
+. Create a `service.HeartbeatService` class to generate and save heartbeats to the database. [`r2dbc-heartservice`]
 +
 The `create()` method is marked with Spring Boot's `@Scheduled` annotation, which will cause the method to be called asynchronously on a schedule you define. Specifying `fixedRate = 1000` means the method will execute every 1000 milliseconds (i.e. one second).
 
 . To enable scheduling, add `@EnableScheduling` to the main `OktaR2dbcApplication` class.
 
-. Open `ApplicationRouter` and modify the `route()` method to add a routing for `/heartbeats`.
+. Open `ApplicationRouter`, inject `HeartbeatRepository` in the constructor, and modify the `route()` method to add a routing for `/heartbeats`. [`r2dbc-router-heartbeats`]
++
+[source,java]
+----
+private final HeartbeatRepository heartbeatRepository;
 
-. Modify `protected.html` to call this endpoint and stream its data with jQuery.
+public ApplicationRouter(HeartbeatRepository heartbeatRepository) {
+    this.heartbeatRepository = heartbeatRepository;
+}
+----
+
+. Modify `protected.html` to call this endpoint and stream its data with jQuery. [`r2dbc-protected-heartbeats`]
 
 . Restart the app, go to `http://localhost:8080/protected`, and you'll see a streaming, constantly updating list of heartbeats.
 
